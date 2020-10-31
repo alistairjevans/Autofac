@@ -67,14 +67,14 @@ namespace Autofac.Core.Lifetime
         /// </summary>
         /// <param name="tag">The tag applied to the <see cref="ILifetimeScope"/>.</param>
         /// <param name="componentRegistry">Components used in the scope.</param>
-        public LifetimeScope(IComponentRegistry componentRegistry, object tag)
+        public LifetimeScope(IComponentRegistry componentRegistry, object tag, DiagnosticListener diagnosticSource)
         {
             ComponentRegistry = componentRegistry ?? throw new ArgumentNullException(nameof(componentRegistry));
             Tag = tag ?? throw new ArgumentNullException(nameof(tag));
 
             _sharedInstances[SelfRegistrationId] = this;
             RootLifetimeScope = this;
-            DiagnosticSource = new DiagnosticListener("Autofac");
+            DiagnosticSource = diagnosticSource;
             Disposer.AddInstanceForDisposal(DiagnosticSource);
         }
 
@@ -82,8 +82,8 @@ namespace Autofac.Core.Lifetime
         /// Initializes a new instance of the <see cref="LifetimeScope"/> class.
         /// </summary>
         /// <param name="componentRegistry">Components used in the scope.</param>
-        public LifetimeScope(IComponentRegistry componentRegistry)
-            : this(componentRegistry, RootTag)
+        public LifetimeScope(IComponentRegistry componentRegistry, DiagnosticListener diagnosticSource)
+            : this(componentRegistry, RootTag, diagnosticSource)
         {
         }
 
@@ -239,7 +239,7 @@ namespace Autofac.Core.Lifetime
             var fallbackProperties = new FallbackDictionary<string, object?>(ComponentRegistry.Properties);
             var registryBuilder = new ComponentRegistryBuilder(tracker, fallbackProperties);
 
-            var builder = new ContainerBuilder(fallbackProperties, registryBuilder);
+            var builder = new ContainerBuilder(fallbackProperties, registryBuilder, DiagnosticSource);
 
             foreach (var source in ComponentRegistry.Sources)
             {

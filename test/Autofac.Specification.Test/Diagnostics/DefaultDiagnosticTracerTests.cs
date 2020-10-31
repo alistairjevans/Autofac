@@ -2,7 +2,9 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using Autofac.Core.Resolving.Pipeline;
 using Autofac.Diagnostics;
+using Autofac.Test.Scenarios.Graph1.GenericContraints;
 using Xunit;
 
 namespace Autofac.Specification.Test.Diagnostics
@@ -110,6 +112,29 @@ namespace Autofac.Specification.Test.Diagnostics
             // The dictionary of tracked operations and
             // string builders should be empty.
             Assert.Equal(0, tracer.OperationsInProgress);
+        }
+
+        [Fact]
+        public void CanTraceAutoActivateEvents()
+        {
+            var tracer = new DefaultDiagnosticTracer();
+
+            var resolved = 0;
+
+            tracer.OperationCompleted += (sender, args) =>
+            {
+                resolved++;
+            };
+
+            var containerBuilder = new ContainerBuilder();
+
+            containerBuilder.RegisterType<Implementor>().As<IService>().SingleInstance().AutoActivate();
+
+            containerBuilder.SubscribeToDiagnostics(tracer);
+
+            var container = containerBuilder.Build();
+
+            Assert.Equal(1, resolved);
         }
 
         private interface IService

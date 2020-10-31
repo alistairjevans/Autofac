@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Registration;
@@ -56,7 +57,7 @@ namespace Autofac
         /// </summary>
         /// <param name="properties">The properties used during component registration.</param>
         internal ContainerBuilder(IDictionary<string, object?> properties)
-            : this(properties, new ComponentRegistryBuilder(new DefaultRegisteredServicesTracker(), properties))
+            : this(properties, new ComponentRegistryBuilder(new DefaultRegisteredServicesTracker(), properties), new DiagnosticListener("Autofac"))
         {
         }
 
@@ -64,8 +65,8 @@ namespace Autofac
         /// Initializes a new instance of the <see cref="ContainerBuilder"/> class.
         /// </summary>
         /// <param name="componentRegistryBuilder">The builder to use for building the underlying <see cref="IComponentRegistry" />.</param>
-        internal ContainerBuilder(IComponentRegistryBuilder componentRegistryBuilder)
-            : this(new Dictionary<string, object?>(), componentRegistryBuilder)
+        internal ContainerBuilder(IComponentRegistryBuilder componentRegistryBuilder, DiagnosticListener diagnosticSource)
+            : this(new Dictionary<string, object?>(), componentRegistryBuilder, diagnosticSource)
         {
         }
 
@@ -74,10 +75,11 @@ namespace Autofac
         /// </summary>
         /// <param name="properties">The properties used during component registration.</param>
         /// <param name="componentRegistryBuilder">The builder to use for building the underlying <see cref="IComponentRegistry" />.</param>
-        internal ContainerBuilder(IDictionary<string, object?> properties, IComponentRegistryBuilder componentRegistryBuilder)
+        internal ContainerBuilder(IDictionary<string, object?> properties, IComponentRegistryBuilder componentRegistryBuilder, DiagnosticListener diagnosticSource)
         {
             Properties = properties;
             ComponentRegistryBuilder = componentRegistryBuilder;
+            DiagnosticSource = diagnosticSource;
         }
 
         /// <summary>
@@ -93,6 +95,8 @@ namespace Autofac
         /// context across registrations.
         /// </value>
         public IDictionary<string, object?> Properties { get; }
+
+        public DiagnosticListener DiagnosticSource { get; }
 
         /// <summary>
         /// Register a callback that will be invoked when the container is configured.
@@ -165,7 +169,7 @@ namespace Autofac
 
             var componentRegistry = ComponentRegistryBuilder.Build();
 
-            var result = new Container(componentRegistry);
+            var result = new Container(componentRegistry, DiagnosticSource);
             if ((options & ContainerBuildOptions.IgnoreStartableComponents) == ContainerBuildOptions.None)
             {
                 StartableManager.StartStartableComponents(Properties, result);

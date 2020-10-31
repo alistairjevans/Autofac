@@ -23,10 +23,10 @@ namespace Autofac.Core
         /// Initializes a new instance of the <see cref="Container"/> class.
         /// </summary>
         /// <param name="componentRegistry">The registry of components.</param>
-        internal Container(IComponentRegistry componentRegistry)
+        internal Container(IComponentRegistry componentRegistry, DiagnosticListener diagnosticSource)
         {
             ComponentRegistry = componentRegistry;
-            _rootLifetimeScope = new LifetimeScope(ComponentRegistry);
+            _rootLifetimeScope = new LifetimeScope(ComponentRegistry, diagnosticSource);
         }
 
         /// <summary>

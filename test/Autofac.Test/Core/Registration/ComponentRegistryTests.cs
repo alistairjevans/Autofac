@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Autofac.Builder;
 using Autofac.Core;
@@ -242,7 +243,7 @@ namespace Autofac.Test.Core.Registration
             var first = RegistrationBuilder.ForType<object>().CreateRegistration();
             registryBuilder.Register(first);
 
-            using (var container = new Container(registryBuilder.Build()))
+            using (var container = new Container(registryBuilder.Build(), new DiagnosticListener("Autofac")))
             {
                 var meta1 = container.ComponentRegistry.RegistrationsFor(metaService);
                 Assert.Single(meta1);
@@ -292,7 +293,7 @@ namespace Autofac.Test.Core.Registration
             registryBuilder.Register(RegistrationBuilder.ForType<object>().CreateRegistration());
             var adapterService = new TypedService(typeof(Func<object>));
 
-            using (var container = new Container(registryBuilder.Build()))
+            using (var container = new Container(registryBuilder.Build(), new DiagnosticListener("Autofac")))
             {
                 var pre = container.ComponentRegistry.RegistrationsFor(adapterService);
                 Assert.Empty(pre);
@@ -316,7 +317,7 @@ namespace Autofac.Test.Core.Registration
 
             var chainedService = new TypedService(typeof(Meta<Func<object>>));
 
-            using (var container = new Container(registryBuilder.Build()))
+            using (var container = new Container(registryBuilder.Build(), new DiagnosticListener("Autofac")))
             {
                 var pre = container.ComponentRegistry.RegistrationsFor(chainedService);
                 Assert.Single(pre);
@@ -338,7 +339,7 @@ namespace Autofac.Test.Core.Registration
             registryBuilder.AddRegistrationSource(new GeneratedFactoryRegistrationSource());
             var adapterService = new TypedService(typeof(Func<object>));
 
-            using (var container = new Container(registryBuilder.Build()))
+            using (var container = new Container(registryBuilder.Build(), new DiagnosticListener("Autofac")))
             {
                 container.ComponentRegistry.RegistrationsFor(adapterService);
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Autofac.Core;
 using Autofac.Core.Registration;
@@ -26,7 +27,7 @@ namespace Autofac.Test.Core
             var builder = Factory.CreateEmptyComponentRegistryBuilder();
             builder.Register(r);
 
-            var c = new ContainerBuilder(builder).Build();
+            var c = new ContainerBuilder(builder, new DiagnosticListener("Autofac")).Build();
 
             Assert.True(c.TryResolveNamed(name, typeof(string), out object o));
             Assert.NotNull(o);

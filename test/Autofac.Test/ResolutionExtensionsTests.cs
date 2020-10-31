@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Diagnostics;
 using Autofac.Core;
 using Autofac.Core.Activators.ProvidedInstance;
 using Autofac.Core.Registration;
@@ -30,7 +31,7 @@ namespace Autofac.Test
 
             var builder = Factory.CreateEmptyComponentRegistryBuilder();
             builder.Register(registration);
-            var target = new ContainerBuilder(builder).Build();
+            var target = new ContainerBuilder(builder, new DiagnosticListener("Autofac")).Build();
 
             Assert.True(target.IsRegistered<object>());
             Assert.True(target.IsRegistered<string>());
@@ -44,7 +45,7 @@ namespace Autofac.Test
                 new[] { new TypedService(typeof(string)) },
                 new ProvidedInstanceActivator("Hello")));
 
-            var target = new ContainerBuilder(builder).Build();
+            var target = new ContainerBuilder(builder, new DiagnosticListener("Autofac")).Build();
 
             var inst = target.ResolveOptional<string>();
 
